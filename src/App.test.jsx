@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import { ProductCard } from "./App";
+import { Header, optimizedImageUrl, ProductCard } from "./App";
 import { ShopProvider } from "./shop-context";
 
 const sampleProduct = {
@@ -33,6 +33,34 @@ describe("ProductCard", () => {
   afterEach(() => {
     cleanup();
     localStorage.clear();
+  });
+
+  describe("navigation and image delivery", () => {
+    afterEach(() => {
+      cleanup();
+      localStorage.clear();
+    });
+
+    it("opens a keyboard-friendly category dropdown with every category", () => {
+      render(
+        <MemoryRouter>
+          <ShopProvider>
+            <Header />
+          </ShopProvider>
+        </MemoryRouter>,
+      );
+      fireEvent.click(screen.getByText("Shop by category"));
+      expect(screen.getByRole("link", { name: /Electronics/ })).toBeTruthy();
+      expect(screen.getByRole("link", { name: /Grocery & Essentials/ })).toBeTruthy();
+      expect(document.querySelectorAll(".category-dropdown-menu a")).toHaveLength(8);
+    });
+
+    it("requests appropriately sized, compressed Unsplash images", () => {
+      const url = new URL(optimizedImageUrl("https://images.unsplash.com/photo-demo?w=900&q=85", 480, 65));
+      expect(url.searchParams.get("w")).toBe("480");
+      expect(url.searchParams.get("q")).toBe("65");
+      expect(url.searchParams.get("auto")).toBe("format");
+    });
   });
 
   it("shows product identity, discount, and stock-aware cart action", () => {

@@ -22,11 +22,39 @@ const categories = [
   ["Grocery & Essentials", "Grocery & Essentials", "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=700&q=80"],
 ];
 
-function ProductImage({ product, className = "" }) {
-  return <img className={className} src={product.image_url || FALLBACK_IMAGE} alt={product.name} loading="lazy" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = FALLBACK_IMAGE; }} />;
+export const optimizedImageUrl = (source, width, quality = 68) => {
+  if (!source || !source.includes("images.unsplash.com")) return source || FALLBACK_IMAGE;
+  try {
+    const url = new URL(source);
+    url.searchParams.set("auto", "format");
+    url.searchParams.set("fit", "crop");
+    url.searchParams.set("w", String(width));
+    url.searchParams.set("q", String(quality));
+    return url.toString();
+  } catch {
+    return source;
+  }
+};
+
+function ProductImage({ product, className = "", eager = false }) {
+  const source = product.image_url || FALLBACK_IMAGE;
+  const srcSet = source.includes("images.unsplash.com")
+    ? [320, 480, 800].map((width) => `${optimizedImageUrl(source, width)} ${width}w`).join(", ")
+    : undefined;
+  return <img
+    className={className}
+    src={optimizedImageUrl(source, eager ? 1000 : 480, eager ? 75 : 65)}
+    srcSet={srcSet}
+    sizes={eager ? "(max-width: 760px) 100vw, 50vw" : "(max-width: 760px) 50vw, 25vw"}
+    alt={product.name}
+    loading={eager ? "eager" : "lazy"}
+    fetchPriority={eager ? "high" : "auto"}
+    decoding="async"
+    onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = FALLBACK_IMAGE; event.currentTarget.removeAttribute("srcset"); }}
+  />;
 }
 
-function Header() {
+export function Header() {
   const { cart, user, wishlist } = useShop();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -45,15 +73,36 @@ function Header() {
         <div className="delivery-chip"><MapPin size={17} /><span><small>Delivering to</small><b>Your location</b></span></div>
         <form className="search-form" onSubmit={submit}><label className="sr-only" htmlFor="global-search">Search products</label><input id="global-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search products, brands and more" /><button aria-label="Search"><Search size={20} /></button></form>
         <div className="header-actions">
-          <Link className="header-link account-link" to={user ? "/account" : "/login"}><UserRound size={20} /><span><small>{user ? `Hello, ${user.first_name || user.username}` : "Welcome"}</small><b>{user ? "Your account" : "Sign in"}</b></span></Link>
+          <details className="header-account-dropdown">
+            <summary className="header-link account-link"><UserRound size={20} /><span><small>{user ? `Hello, ${user.first_name || user.username}` : "Welcome"}</small><b>{user ? "Your account" : "Sign in"}</b></span><ChevronDown size={13} /></summary>
+            <div className="header-dropdown-menu account-dropdown-menu">
+              {user ? <>
+                <span className="dropdown-heading">Your ShopSphere</span>
+                <Link to="/account" onClick={(event) => event.currentTarget.closest("details").open = false}>My account</Link>
+                <Link to="/account" onClick={(event) => event.currentTarget.closest("details").open = false}>Orders</Link>
+                <Link to="/wishlist" onClick={(event) => event.currentTarget.closest("details").open = false}>Wishlist ({wishlist.length})</Link>
+                <Link to="/account?tab=addresses" onClick={(event) => event.currentTarget.closest("details").open = false}>Saved addresses</Link>
+              </> : <>
+                <span className="dropdown-heading">Welcome to ShopSphere</span>
+                <Link to="/login" onClick={(event) => event.currentTarget.closest("details").open = false}>Sign in</Link>
+                <Link to="/register" onClick={(event) => event.currentTarget.closest("details").open = false}>Create an account</Link>
+                <Link to="/account" onClick={(event) => event.currentTarget.closest("details").open = false}>Track an order</Link>
+              </>}
+            </div>
+          </details>
           <Link className="header-link orders-link" to="/account"><PackageCheck size={20} /><span><small>Track & manage</small><b>Orders</b></span></Link>
           <Link className="cart-link" to="/cart" aria-label={`Cart with ${itemCount} items`}><ShoppingCart size={23} /><span className="cart-count">{itemCount}</span><b>Cart</b></Link>
         </div>
       </div>
       <nav className={`category-nav ${open ? "nav-open" : ""}`} aria-label="Main navigation"><div className="container nav-inner">
-        <Link to="/products"><SlidersHorizontal size={16} /> All products</Link>
-        {categories.slice(0, 6).map(([name, value]) => <Link key={name} to={`/products?category=${encodeURIComponent(value)}`}>{name}</Link>)}
-        <Link className="nav-deal" to="/products?deals=true"><Sparkles size={15} /> Today's finds</Link>
+        <Link to="/products" onClick={() => setOpen(false)}><SlidersHorizontal size={16} /> All products</Link>
+        <details className="category-dropdown">
+          <summary aria-label="Browse product categories"><span>Shop by category</span><ChevronDown size={14} /></summary>
+          <div className="header-dropdown-menu category-dropdown-menu">
+            {categories.map(([name, value]) => <Link key={name} to={`/products?category=${encodeURIComponent(value)}`} onClick={(event) => { setOpen(false); event.currentTarget.closest("details").open = false; }}>{name}<ChevronRight size={14} /></Link>)}
+          </div>
+        </details>
+        <Link className="nav-deal" to="/products?deals=true" onClick={() => setOpen(false)}><Sparkles size={15} /> Today's finds</Link>
       </div></nav>
     </header>
   </>;
@@ -128,7 +177,7 @@ function HomePage() {
   }, []);
   return <main>
     <section className="hero"><div className="container hero-inner"><div className="hero-copy"><span className="hero-kicker"><Sparkles size={15} /> A little more lovely, every day</span><h1>Find your next<br /><em>everyday favourite.</em></h1><p>Thoughtful finds for home, work and everything in between. Discover more of what you love.</p><div className="hero-actions"><Link to="/products" className="button button-light">Explore the collection <ArrowRight size={17} /></Link><Link to="/products?deals=true" className="hero-secondary">See today's finds <ChevronRight size={15} /></Link></div><div className="hero-trust"><span><Check size={14} /> Curated for you</span><span><Check size={14} /> Easy returns</span><span><Check size={14} /> Secure checkout</span></div></div><div className="hero-visual"><div className="hero-photo"></div><div className="hero-note"><span className="hero-note-icon"><Sparkles size={16} /></span><span><b>Good things, found.</b><small>Your next favourite is waiting.</small></span></div><div className="hero-sticker">THE EVERYDAY<br /><b>EDIT</b></div></div></div></section>
-    <section className="container category-section"><SectionTitle eyebrow="A world of good things" title="Shop by category" /><div className="category-grid">{categories.map(([name, slug, image], index) => <Link to={`/products?category=${encodeURIComponent(slug)}`} className="category-card" key={name}><img src={image} alt="" onError={(event) => { event.currentTarget.src = FALLBACK_IMAGE; }} /><span className="category-index">0{index + 1}</span><b>{name}</b><span className="category-arrow"><ArrowRight size={15} /></span></Link>)}</div></section>
+    <section className="container category-section"><SectionTitle eyebrow="A world of good things" title="Shop by category" /><div className="category-grid">{categories.map(([name, slug, image], index) => <Link to={`/products?category=${encodeURIComponent(slug)}`} className="category-card" key={name}><img src={optimizedImageUrl(image, 480, 60)} alt="" loading="lazy" decoding="async" onError={(event) => { event.currentTarget.src = FALLBACK_IMAGE; }} /><span className="category-index">0{index + 1}</span><b>{name}</b><span className="category-arrow"><ArrowRight size={15} /></span></Link>)}</div></section>
     <section className="soft-section"><div className="container"><SectionTitle eyebrow="A little something special" title="Today's finds" action="/products?deals=true" actionText="View all deals" />
       {dealsError && <ErrorBanner message={dealsError} retry={reloadDeals} />}
       {dealsLoading ? <ProductSkeleton /> : <ProductGrid products={deals.slice(0, 4)} compact />}
@@ -136,7 +185,7 @@ function HomePage() {
     <section className="container featured-section"><SectionTitle eyebrow="Picked for your everyday" title="Popular right now" action="/products?sort=popularity" />
       {error ? <ErrorBanner message={error} retry={() => window.location.reload()} /> : loading ? <ProductSkeleton /> : <ProductGrid products={products.slice(0, 4)} compact />}
     </section>
-    <section className="container promo-grid"><Link className="promo-card promo-home" to="/products?category=Home%20%26%20Kitchen"><span>Make room for good living</span><b>Little home<br />upgrades.</b><span className="promo-link">Find your home edit <ArrowRight size={15} /></span></Link><Link className="promo-card promo-style" to="/products?category=Fashion"><span>Made to move with you</span><b>Everyday<br />style, reimagined.</b><span className="promo-link">Explore the edit <ArrowRight size={15} /></span></Link><Link className="promo-card promo-tech" to="/products?category=Electronics"><span>Smart picks, bright ideas</span><b>Tech that just<br />makes sense.</b><span className="promo-link">See the collection <ArrowRight size={15} /></span></Link></section>
+    <section className="container promo-grid"><Link className="promo-card promo-home" to="/products?category=Home%20%26%20Kitchen"><img className="promo-image" src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=600&q=60" alt="" loading="lazy" decoding="async" /><span>Make room for good living</span><b>Little home<br />upgrades.</b><span className="promo-link">Find your home edit <ArrowRight size={15} /></span></Link><Link className="promo-card promo-style" to="/products?category=Fashion"><img className="promo-image" src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=600&q=60" alt="" loading="lazy" decoding="async" /><span>Made to move with you</span><b>Everyday<br />style, reimagined.</b><span className="promo-link">Explore the edit <ArrowRight size={15} /></span></Link><Link className="promo-card promo-tech" to="/products?category=Electronics"><img className="promo-image" src="https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=600&q=60" alt="" loading="lazy" decoding="async" /><span>Smart picks, bright ideas</span><b>Tech that just<br />makes sense.</b><span className="promo-link">See the collection <ArrowRight size={15} /></span></Link></section>
     {recent.length > 0 && <section className="container recent-section"><SectionTitle eyebrow="Back for another look?" title="Recently viewed" /><ProductGrid products={recent.slice(0, 4)} compact /></section>}
     <section className="newsletter"><div className="container newsletter-inner"><div><span className="eyebrow">The good-find letter</span><h2>A little inspiration, in your inbox.</h2><p>New finds, thoughtful picks and a few nice surprises. No noise.</p></div><form onSubmit={(event) => { event.preventDefault(); event.currentTarget.reset(); notify("Email sign-ups are not enabled in this demo."); }}><label className="sr-only" htmlFor="newsletter-email">Your email address</label><input type="email" id="newsletter-email" required placeholder="Your email address" /><button className="button button-dark">Count me in <ArrowRight size={16} /></button></form></div></section>
   </main>;
@@ -252,7 +301,7 @@ function ProductDetailPage() {
     } catch (requestError) { notify(requestError.message || apiError(requestError)); }
   };
   return <main className="container page-wrap"><div className="breadcrumbs"><Link to="/">Home</Link><ChevronRight size={14} /><Link to={`/products?category=${encodeURIComponent(product.category.name)}`}>{product.category.name}</Link><ChevronRight size={14} /><span>{product.name}</span></div>
-    <div className="detail-layout"><div className="detail-image"><ProductImage product={product} />{product.discount_percent > 0 && <span className="discount-tag">{product.discount_percent}% off</span>}</div><div className="detail-info"><span className="eyebrow">{product.brand.name} · {product.category.name}</span><h1>{product.name}</h1><Rating value={product.rating} count={product.review_count} /><div className="detail-price">{money(product.price)} {product.original_price && <del>{money(product.original_price)}</del>} {product.discount_percent > 0 && <span>You save {product.discount_percent}%</span>}</div><p className="detail-description">{product.description}</p><div className={`stock-status ${product.stock ? "" : "stock-out"}`}><span />{product.stock ? `In stock · ${product.stock} available` : "Currently unavailable"}</div><div className="detail-delivery"><Truck size={18} /><span><b>Complimentary delivery over ₹999</b><small>Estimated delivery in 3–6 business days</small></span></div>
+    <div className="detail-layout"><div className="detail-image"><ProductImage product={product} eager />{product.discount_percent > 0 && <span className="discount-tag">{product.discount_percent}% off</span>}</div><div className="detail-info"><span className="eyebrow">{product.brand.name} · {product.category.name}</span><h1>{product.name}</h1><Rating value={product.rating} count={product.review_count} /><div className="detail-price">{money(product.price)} {product.original_price && <del>{money(product.original_price)}</del>} {product.discount_percent > 0 && <span>You save {product.discount_percent}%</span>}</div><p className="detail-description">{product.description}</p><div className={`stock-status ${product.stock ? "" : "stock-out"}`}><span />{product.stock ? `In stock · ${product.stock} available` : "Currently unavailable"}</div><div className="detail-delivery"><Truck size={18} /><span><b>Complimentary delivery over ₹999</b><small>Estimated delivery in 3–6 business days</small></span></div>
       {Object.keys(product.specifications || {}).length > 0 && <div className="specs"><b>Product details</b>{Object.entries(product.specifications).map(([key, value]) => <div key={key}><span>{key}</span><span>{value}</span></div>)}</div>}
       <div className="detail-actions"><div className="quantity-picker"><button disabled={quantity <= 1} aria-label="Decrease quantity" onClick={() => setQuantity((number) => number - 1)}>−</button><span>{quantity}</span><button disabled={quantity >= product.stock} aria-label="Increase quantity" onClick={() => setQuantity((number) => number + 1)}>+</button></div><button className="button button-dark" disabled={!product.stock} onClick={async () => { try { await addToCart(product, quantity); } catch (requestError) { notify(requestError.message || apiError(requestError)); } }}><ShoppingCart size={17} /> Add to cart</button><button className="button button-outline buy-now" disabled={!product.stock} onClick={buyNow}>Buy now</button><button className={`button icon-outline ${liked ? "is-liked" : ""}`} aria-label="Toggle wishlist" onClick={() => toggleWishlist(product).catch((error) => notify(apiError(error)))}><Heart size={18} fill={liked ? "currentColor" : "none"} /></button></div>
       <div className="policy-row"><span><ShieldCheck size={16} /> Secure shopping</span><span><PackageCheck size={16} /> Easy returns</span></div>

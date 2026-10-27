@@ -24,4 +24,37 @@
 @media(max-width:390px){.container{width:calc(100% - 24px)}.hero h1{font-size:34px}.hero-trust{gap:8px}.hero-trust span{font-size:7px}.hero-actions{gap:11px}.hero-secondary{font-size:9px}.product-card-image,.product-card-compact .product-card-image,.catalog-results .product-card-image{height:140px}.header-actions{gap:6px}.category-card{height:112px}.category-card b{font-size:11px}.cart-item{grid-template-columns:61px 1fr auto}.cart-item-image{width:61px;height:65px}.cart-item-controls{gap:5px}.cart-item-controls .quantity-picker{min-width:68px}.cart-line-price{font-size:10px}}
 .address-default{display:flex;align-items:center;gap:7px}.address-fields .address-default input{width:auto;height:auto;margin:0;padding:0;accent-color:var(--teal)}.order-card-actions,.saved-address-actions,.wishlist-actions{display:flex;align-items:center;gap:8px}.order-card-actions{flex-direction:column;align-items:flex-end}.wishlist-wrap{padding-bottom:36px}.wishlist-actions{position:absolute;bottom:0;left:2px}.address-default{grid-column:span 2}
 @media(max-width:760px){.detail-actions{gap:5px}.detail-actions>.button{padding:10px 8px;font-size:9px}.detail-actions>.quantity-picker{min-width:88px}.detail-actions .icon-outline{width:37px;flex:0 0 37px}}
+@media(max-width:760px){.account-dropdown-menu{right:0;max-width:calc(100vw - 24px)}}
 .address-default{display:flex;align-items:center;gap:7px}.address-fields .address-default input{width:auto;height:auto;margin:0;padding:0;accent-color:var(--teal)}.order-card-actions,.saved-address-actions,.wishlist-actions{display:flex;align-items:center;gap:8px}.order-card-actions{flex-direction:column;align-items:flex-end}.wishlist-wrap{padding-bottom:36px}.wishlist-actions{position:absolute;bottom:0;left:2px}.address-default{grid-column:span 2}
+
+.nav-inner{overflow:visible}
+.category-dropdown,.header-account-dropdown{position:relative}
+.category-dropdown>summary,.header-account-dropdown>summary{list-style:none;cursor:pointer}
+.category-dropdown>summary::-webkit-details-marker,.header-account-dropdown>summary::-webkit-details-marker{display:none}
+.category-dropdown>summary{display:flex;align-items:center;gap:5px;font-size:11px;color:#4f5c6e}
+.category-dropdown>summary:hover,.header-account-dropdown>summary:hover{color:var(--teal)}
+.header-dropdown-menu{position:absolute;z-index:25;top:calc(100% + 10px);min-width:230px;padding:8px;background:#fff;border:1px solid #e6eaf0;border-radius:6px;box-shadow:0 12px 30px #12233f20}
+.category-dropdown-menu{left:-13px;top:calc(100% + 13px);width:260px;display:grid;grid-template-columns:1fr}
+.header-dropdown-menu a{display:flex;align-items:center;justify-content:space-between;padding:10px 9px;border-radius:4px;color:#455267;font-size:11px}
+.header-dropdown-menu a:hover,.header-dropdown-menu a:focus-visible{background:#f0f7f6;color:var(--teal)}
+.account-dropdown-menu{right:0;min-width:210px}
+.dropdown-heading{display:block;padding:9px 9px 8px;color:#8a95a2;font-size:9px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;border-bottom:1px solid #edf0f3;margin-bottom:4px}
+.header-account-dropdown>summary{display:flex;align-items:center;gap:7px}
+.header-account-dropdown>summary>svg:last-child{color:#8893a1}
+.header-dropdown-menu a:focus-visible,.category-dropdown>summary:focus-visible,.header-account-dropdown>summary:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.promo-card{isolation:isolate}
+.promo-image{position:absolute;z-index:-1;inset:0;width:100%;height:100%;object-fit:cover}
+.promo-home,.promo-style,.promo-tech{background-image:none}
+.hero-photo{background-image:linear-gradient(180deg,#11233b00 40%,#13253b37),url("https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=900&q=65")}
+
+@media(max-width:760px){
+  .nav-inner{overflow:visible;display:flex;flex-direction:column;align-items:stretch;gap:0}
+  .nav-inner>a,.category-dropdown>summary{width:100%;padding:10px 0;border-bottom:1px solid #f0f2f5}
+  .category-dropdown>summary{justify-content:space-between}
+  .category-dropdown{width:100%}
+  .category-dropdown-menu{position:static;width:100%;min-width:0;box-shadow:none;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:3px 0 7px 10px}
+  .header-account-dropdown .account-link{display:flex;gap:0}
+  .header-account-dropdown .account-link>span,.header-account-dropdown .account-link>svg:last-child{display:none}
+  .header-dropdown-menu{top:calc(100% + 8px)}
+  .account-dropdown-menu{right:0;max-width:calc(100vw - 24px)}
+}
