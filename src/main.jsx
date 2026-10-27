@@ -12,5 +12,6 @@ createRoot(document.getElementById("root")).render(
         <App />
       </ShopProvider>
     </BrowserRouter>
+    
   </React.StrictMode>,
 );
