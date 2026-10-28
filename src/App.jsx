@@ -12,15 +12,50 @@ import { useShop } from "./shop-context";
 const FALLBACK_IMAGE = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480"><rect width="100%" height="100%" fill="#edf1f5"/><circle cx="320" cy="205" r="52" fill="#d5dde7"/><path d="M170 370l105-112 72 77 48-48 75 83z" fill="#c0ccd9"/><text x="50%" y="90%" text-anchor="middle" fill="#6b7787" font-family="Arial" font-size="18">ShopSphere</text></svg>')}`;
 
 const categories = [
-  ["Electronics", "Electronics", "https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=700&q=80"],
-  ["Fashion", "Fashion", "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=700&q=80"],
-  ["Home & Kitchen", "Home & Kitchen", "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=700&q=80"],
-  ["Beauty & Personal Care", "Beauty & Personal Care", "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=700&q=80"],
-  ["Sports & Fitness", "Sports & Fitness", "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=700&q=80"],
-  ["Books", "Books", "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=700&q=80"],
-  ["Toys & Games", "Toys & Games", "https://images.unsplash.com/photo-1558060370-d644479cb6f7?auto=format&fit=crop&w=700&q=80"],
-  ["Grocery & Essentials", "Grocery & Essentials", "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=700&q=80"],
+  ["Electronics", "Electronics", "https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=700&q=80", ["Smartphone", "Laptop", "Headphones", "Smartwatch", "Speaker", "Keyboard"]],
+  ["Fashion", "Fashion", "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=700&q=80", ["Shirt", "Sneakers", "Backpack", "Sweater"]],
+  ["Home & Kitchen", "Home & Kitchen", "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=700&q=80", ["Bottle", "Dinner set", "Air fryer", "Coffee kit", "Kitchen towel"]],
+  ["Beauty & Personal Care", "Beauty & Personal Care", "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=700&q=80", ["Serum", "Cleansing", "Sunscreen", "Wellness kit"]],
+  ["Sports & Fitness", "Sports & Fitness", "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=700&q=80", ["Yoga", "Resistance band", "Shaker", "Running belt"]],
+  ["Books", "Books", "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=700&q=80", ["Habits", "India", "Garden"]],
+  ["Toys & Games", "Toys & Games", "https://images.unsplash.com/photo-1558060370-d644479cb6f7?auto=format&fit=crop&w=700&q=80", ["Building blocks", "Strategy game", "Puzzle"]],
+  ["Grocery & Essentials", "Grocery & Essentials", "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=700&q=80", ["Pantry", "Food storage", "Tea"]],
 ];
+
+const categoryMenuSections = {
+  Electronics: [
+    { title: "Shop by type", items: ["Smartphone", "Laptop", "Headphones", "Smartwatch", "Speaker", "Keyboard", "Earbuds", "Smart TV"] },
+    { title: "Popular picks", items: ["Aero 5G Smartphone", "Studio Pro Laptop", "Cloud Wireless Headphones", "Aero Wireless Earbuds"] },
+  ],
+  Fashion: [
+    { title: "Shop by style", items: ["Shirt", "T-Shirt", "Sneakers", "Walking Shoes", "Backpack", "Pullover"] },
+    { title: "Popular picks", items: ["Classic Cotton Shirt", "Everyday Cotton T-Shirt", "Canvas Everyday Sneakers", "Weekend Walking Shoes"] },
+  ],
+  "Home & Kitchen": [
+    { title: "Shop for your home", items: ["Bottle", "Dinner Set", "Air Fryer", "Coffee", "Bedsheet", "Water Carafe"] },
+    { title: "Popular picks", items: ["Insulated Steel Bottle", "Ceramic Dinner Set", "Compact Air Fryer", "Cotton Bedsheet Set"] },
+  ],
+  "Beauty & Personal Care": [
+    { title: "Shop personal care", items: ["Serum", "Face Wash", "Cleansing", "Sunscreen", "Hand Cream", "Wellness"] },
+    { title: "Popular picks", items: ["Daily Hydration Serum", "Gentle Daily Face Wash", "Mineral Sunscreen SPF 50", "Nourishing Hand Cream"] },
+  ],
+  "Sports & Fitness": [
+    { title: "Shop by activity", items: ["Yoga", "Resistance", "Shaker", "Running", "Dumbbell", "Fitness"] },
+    { title: "Popular picks", items: ["Adjustable Yoga Mat", "Resistance Band Set", "Adjustable Dumbbell Pair", "Cork Yoga Block Set"] },
+  ],
+  Books: [
+    { title: "Explore books", items: ["Habits", "India", "Garden", "Journal", "Stories"] },
+    { title: "Popular picks", items: ["The Art of Small Habits", "A Journey Through India", "The Curious Garden", "Quiet Mornings Journal"] },
+  ],
+  "Toys & Games": [
+    { title: "Shop playtime", items: ["Building Blocks", "Strategy Game", "Puzzle", "Magnetic", "Science"] },
+    { title: "Popular picks", items: ["Creative Building Blocks", "Family Strategy Game", "Wooden Puzzle Set", "Magnetic Builder Tiles"] },
+  ],
+  "Grocery & Essentials": [
+    { title: "Shop everyday essentials", items: ["Pantry", "Food Storage", "Tea", "Coffee", "Snacks", "Kitchen Towel"] },
+    { title: "Popular picks", items: ["Pantry Starter Box", "Organic Tea Discovery Pack", "Ground Coffee Discovery Pack", "Wholegrain Snack Box"] },
+  ],
+};
 
 export const optimizedImageUrl = (source, width, quality = 68) => {
   if (!source || !source.includes("images.unsplash.com")) return source || FALLBACK_IMAGE;
@@ -58,12 +93,35 @@ export function Header() {
   const { cart, user, wishlist } = useShop();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [openCategory, setOpenCategory] = useState("");
+  const [menuOffset, setMenuOffset] = useState(0);
+  const [activeCategory, setActiveCategory] = useState(categories[0][0]);
   const navigate = useNavigate();
   const itemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
   const submit = (event) => {
     event.preventDefault();
     navigate(`/products?search=${encodeURIComponent(query.trim())}`);
   };
+  const closeMenu = () => setOpen(false);
+  const openDepartmentMenu = (name, event) => {
+    const bounds = event.currentTarget.closest(".secondary-category").getBoundingClientRect();
+    const menuWidth = Math.min(760, window.innerWidth - 32);
+    const menuLeft = Math.max(16, Math.min(bounds.left, window.innerWidth - menuWidth - 16));
+    setMenuOffset(menuLeft - bounds.left);
+    setOpenCategory(name);
+  };
+  useEffect(() => {
+    if (!open) return undefined;
+    document.body.style.overflow = "hidden";
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") closeMenu();
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [open]);
   return <>
     <div className="utilitybar"><div className="container utility-inner"><span>Thoughtful finds, delivered to your door.</span><span className="utility-right"><Truck size={14} /> Free delivery on orders over ₹999 <span className="utility-divider">|</span> India</span></div></div>
     <header className="site-header">
@@ -94,17 +152,80 @@ export function Header() {
           <Link className="cart-link" to="/cart" aria-label={`Cart with ${itemCount} items`}><ShoppingCart size={23} /><span className="cart-count">{itemCount}</span><b>Cart</b></Link>
         </div>
       </div>
-      <nav className={`category-nav ${open ? "nav-open" : ""}`} aria-label="Main navigation"><div className="container nav-inner">
-        <Link to="/products" onClick={() => setOpen(false)}><SlidersHorizontal size={16} /> All products</Link>
-        <details className="category-dropdown">
-          <summary aria-label="Browse product categories"><span>Shop by category</span><ChevronDown size={14} /></summary>
-          <div className="header-dropdown-menu category-dropdown-menu">
-            {categories.map(([name, value]) => <Link key={name} to={`/products?category=${encodeURIComponent(value)}`} onClick={(event) => { setOpen(false); event.currentTarget.closest("details").open = false; }}>{name}<ChevronRight size={14} /></Link>)}
+      <nav className="shopping-navigation" aria-label="Shop navigation" onKeyDown={(event) => { if (event.key === "Escape") setOpenCategory(""); }}>
+        <div className="primary-nav">
+          <div className="container primary-nav-inner">
+            <button className="all-menu-trigger" type="button" aria-expanded={open} aria-controls="all-categories-menu" onClick={() => setOpen((value) => !value)}>
+              <Menu size={18} /> <span>All</span>
+            </button>
+            <Link to="/products?deals=true">Today's finds</Link>
+            <Link to="/products?ordering=-popularity">Bestsellers</Link>
+            <Link to="/products?deals=true">Offers</Link>
+            <Link to="/products?category=Electronics">Electronics</Link>
+            <Link to="/products?category=Fashion">Fashion</Link>
+            <Link to="/products?category=Books">Books</Link>
+            <span className="primary-nav-promo"><Sparkles size={15} /> The Everyday Edit</span>
           </div>
-        </details>
-        <Link className="nav-deal" to="/products?deals=true" onClick={() => setOpen(false)}><Sparkles size={15} /> Today's finds</Link>
-      </div></nav>
+        </div>
+        <div className="secondary-nav" aria-label="Browse departments">
+          <div className="container secondary-nav-inner">
+            {categories.map(([name, value]) => <details className="secondary-category" key={name} open={openCategory === name} onMouseEnter={(event) => openDepartmentMenu(name, event)} onMouseLeave={() => setOpenCategory("")}>
+              <summary onFocus={(event) => openDepartmentMenu(name, event)} onClick={(event) => { event.preventDefault(); openDepartmentMenu(name, event); }}>{name}<ChevronDown size={12} /></summary>
+              <div className="header-dropdown-menu secondary-category-menu" style={{ "--secondary-menu-offset": `${menuOffset}px` }}>
+                <div className="secondary-menu-heading">
+                  <span className="dropdown-heading">Explore {name}</span>
+                  <Link className="secondary-menu-shop-all" to={`/products?category=${encodeURIComponent(value)}`} onClick={(event) => { closeMenu(); event.currentTarget.closest("details").open = false; }}>Shop all {name}<ArrowRight size={15} /></Link>
+                </div>
+                <div className="secondary-menu-columns">
+                  {categoryMenuSections[name].map((section) => <section className="secondary-menu-section" key={section.title}>
+                    <h3>{section.title}</h3>
+                    {section.items.map((item) => <Link key={item} to={`/products?search=${encodeURIComponent(item)}`} onClick={(event) => { closeMenu(); event.currentTarget.closest("details").open = false; }}>{item}<ChevronRight size={13} /></Link>)}
+                  </section>)}
+                  <section className="secondary-menu-section secondary-menu-discover">
+                    <h3>More to discover</h3>
+                    <Link to={`/products?category=${encodeURIComponent(value)}&deals=true`} onClick={(event) => { closeMenu(); event.currentTarget.closest("details").open = false; }}>Deals in {name}<ChevronRight size={13} /></Link>
+                    <Link to={`/products?category=${encodeURIComponent(value)}&ordering=-popularity`} onClick={(event) => { closeMenu(); event.currentTarget.closest("details").open = false; }}>Bestsellers<ChevronRight size={13} /></Link>
+                  </section>
+                </div>
+              </div>
+            </details>)}
+          </div>
+        </div>
+      </nav>
     </header>
+    {open && <div className="all-menu-layer">
+      <button className="all-menu-backdrop" type="button" aria-label="Close all categories menu" onClick={closeMenu} />
+      <aside className="all-menu-drawer" id="all-categories-menu" role="dialog" aria-modal="true" aria-label="All shopping categories">
+        <div className="all-menu-heading">
+          <span><Menu size={18} /> Browse ShopSphere</span>
+          <button type="button" aria-label="Close menu" onClick={closeMenu}><X size={20} /></button>
+        </div>
+        <div className="all-menu-greeting">{user ? `Hello, ${user.first_name || user.username}` : "Discover something for every day"}</div>
+        <div className="all-menu-content">
+          <div className="all-menu-departments" aria-label="Departments">
+            {categories.map(([name]) => <button
+              key={name}
+              type="button"
+              className={activeCategory === name ? "department-active" : ""}
+              aria-current={activeCategory === name ? "true" : undefined}
+              onMouseEnter={() => setActiveCategory(name)}
+              onFocus={() => setActiveCategory(name)}
+              onClick={() => setActiveCategory(name)}
+            >{name}<ChevronRight size={15} /></button>)}
+          </div>
+          {categories.filter(([name]) => name === activeCategory).map(([name, value, , subcategories]) => <div className="all-menu-subcategories" key={name} aria-label={`${name} subcategories`}>
+            <span className="dropdown-heading">Explore {name}</span>
+            <Link className="category-shop-all" to={`/products?category=${encodeURIComponent(value)}`} onClick={closeMenu}>Shop all {name}<ChevronRight size={14} /></Link>
+            {subcategories.map((subcategory) => <Link key={subcategory} to={`/products?search=${encodeURIComponent(subcategory)}`} onClick={closeMenu}>{subcategory}<ChevronRight size={14} /></Link>)}
+          </div>)}
+        </div>
+        <div className="all-menu-footer">
+          <Link to={user ? "/account" : "/login"} onClick={closeMenu}><UserRound size={16} /> {user ? "Your account" : "Sign in"}</Link>
+          <Link to="/account" onClick={closeMenu}><PackageCheck size={16} /> Your orders</Link>
+          <Link to="/wishlist" onClick={closeMenu}><Heart size={16} /> Your wishlist</Link>
+        </div>
+      </aside>
+    </div>}
   </>;
 }
 
